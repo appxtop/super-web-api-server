@@ -8,15 +8,17 @@ import (
 
 	"github.com/Danny-Dasilva/CycleTLS/cycletls"
 	http "github.com/Danny-Dasilva/fhttp"
+	"github.com/getlantern/systray"
 )
 
 const ja3 = "771,52393-52392-52244-52243-49195-49199-49196-49200-49171-49172-156-157-47-53-10,65281-0-23-35-13-5-18-16-30032-11-10,29-23-24,0"
-
-var ua = "Chrome Version 57.0.2987.110 (64-bit) Linux"
+const userAgent = "Chrome Version 57.0.2987.110 (64-bit) Linux"
 
 // 复制头部
 
 func main() {
+
+	go systray.Run(SetupTray, onExit)
 
 	fmt.Println("程序开始运行...")
 	http.HandleFunc("/proxy", func(w http.ResponseWriter, r *http.Request) {
@@ -54,11 +56,13 @@ func main() {
 			Body:   r.Body,
 		}
 
+		var userAgent_tmp string = userAgent
+
 		for key, values := range r.Header {
 			for _, value := range values {
 				fmt.Printf("req Header: %s: %s\n", key, value)
 				if strings.ToUpper(key) == "USER-AGENT" {
-					ua = value
+					userAgent_tmp = value
 				} else if key != "Content-Length" {
 					newRequest.Header.Add(key, value)
 				}
@@ -72,7 +76,7 @@ func main() {
 		}
 
 		client := &http.Client{
-			Transport: cycletls.NewTransportWithProxy(ja3, ua, proxyDialer),
+			Transport: cycletls.NewTransportWithProxy(ja3, userAgent_tmp, proxyDialer),
 		}
 
 		// 发送请求并获取响应
@@ -96,7 +100,13 @@ func main() {
 		fmt.Println("处理完成=================================")
 	})
 
-	err := http.ListenAndServe(":8081", nil)
+	config := GetConfig()
+
+	address := config.Host + ":" + config.Port
+
+	fmt.Println("监听地址：", address)
+
+	err := http.ListenAndServe(address, nil)
 	if err != nil {
 		panic(err)
 	}

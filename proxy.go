@@ -9,6 +9,7 @@ import (
 	"golang.org/x/net/proxy"
 )
 
+// 从注册表获取代理信息
 func GetProxy() (string, error) {
 	k, err := registry.OpenKey(registry.CURRENT_USER, `Software\Microsoft\Windows\CurrentVersion\Internet Settings`, registry.READ)
 	if err != nil {

@@ -27,12 +27,12 @@ func SetupTray() {
 	exitItem := systray.AddMenuItem("退出", "退出应用程序")
 	go func() {
 		<-exitItem.ClickedCh
-		onExit()
+		OnExit()
 	}()
 
 }
 
-func onExit() {
+func OnExit() {
 	// Cleanup code here
 	fmt.Println("程序退出")
 	// 退出程序

@@ -66,11 +66,12 @@ func webDav() error {
 	// 遍历所有盘符，创建对应的 WebDAV 文件系统
 	for _, drive := range drives {
 		// 创建一个 WebDAV 文件系统处理器
+		fmt.Println("创建 WebDAV 文件系统处理器：", drive)
 		p := "/webdav/" + drive[0:1] // 路径前缀，如 /C/
 		handler := &webdav.Handler{
-			Prefix:     p,                 // WebDAV的路径前缀
-			FileSystem: webdav.Dir(drive), // 文件存储的目录
-			LockSystem: webdav.NewMemLS(), // 锁系统，用于防止并发修改
+			Prefix:     p,                        // WebDAV的路径前缀
+			FileSystem: webdav.Dir(drive + "//"), // 文件存储的目录
+			LockSystem: webdav.NewMemLS(),        // 锁系统，用于防止并发修改
 		}
 		fmt.Println("webdav服务监听:", p)
 		http.Handle(p, handler)
